@@ -1,0 +1,30 @@
+[
+  {
+    "id": "sun",
+    "name": "Sun",
+    "type": "sun",
+    "ra": 0.0,
+    "dec": 0.0,
+    "magnitude": -26.74,
+    "description": "The star at the center of our solar system. RA/Dec here are placeholders for demo."
+  },
+  {
+    "id": "moon",
+    "name": "Moon",
+    "type": "moon",
+    "ra": 2.0,
+    "dec": 5.0,
+    "magnitude": -12.7,
+    "description": "Earth's natural satellite. Position here is approximate for demo."
+  },
+  { "id":"mercury","name":"Mercury","type":"planet","ra":7.0,"dec":20.0,"magnitude":-1.9,"description":"Mercury (placeholder RA/Dec)" },
+  { "id":"venus","name":"Venus","type":"planet","ra":5.0,"dec":10.0,"magnitude":-4.6,"description":"Venus (placeholder RA/Dec)" },
+  { "id":"mars","name":"Mars","type":"planet","ra":10.0,"dec":15.0,"magnitude":-2.0,"description":"Mars (placeholder RA/Dec)" },
+  { "id":"jupiter","name":"Jupiter","type":"planet","ra":12.0,"dec":-5.0,"magnitude":-2.7,"description":"Jupiter (placeholder RA/Dec)" },
+  { "id":"saturn","name":"Saturn","type":"planet","ra":18.0,"dec":-10.0,"magnitude":0.7,"description":"Saturn (placeholder RA/Dec)" },
+  { "id":"uranus","name":"Uranus","type":"planet","ra":22.0,"dec":0.0,"magnitude":5.8,"description":"Uranus (placeholder RA/Dec)" },
+  { "id":"neptune","name":"Neptune","type":"planet","ra":1.0,"dec":-15.0,"magnitude":7.8,"description":"Neptune (placeholder RA/Dec)" },
+  { "id":"orion","name":"Orion (constellation)","type":"constellation","ra":5.5,"dec":-5.0,"magnitude":1.0,"description":"Orion — rough representative point." },
+  { "id":"ursa_major","name":"Ursa Major","type":"constellation","ra":11.0,"dec":55.0,"magnitude":1.0,"description":"Ursa Major — rough representative point." },
+  { "id":"scorpius","name":"Scorpius","type":"constellation","ra":16.5,"dec":-30.0,"magnitude":1.0,"description":"Scorpius — rough representative point." }
+]
