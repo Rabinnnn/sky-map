@@ -69,7 +69,7 @@ The app integrates with multiple NASA APIs:
 
 1. Clone the repository:
 ```bash
-git clone 
+git clone https://github.com/Rabinnnn/sky-map.git
 cd sky_map
 ```
 
@@ -78,24 +78,7 @@ cd sky_map
 flutter pub get
 ```
 
-3. Configure permissions:
-
-**Android** (`android/app/src/main/AndroidManifest.xml`):
-```xml
-
-
-
-```
-
-**iOS** (`ios/Runner/Info.plist`):
-```xml
-NSLocationWhenInUseUsageDescription
-This app needs location access to show celestial objects at your location
-NSLocationAlwaysUsageDescription
-This app needs location access to show celestial objects at your location
-```
-
-4. Run the app:
+3. Run the app:
 ```bash
 flutter run
 ```
