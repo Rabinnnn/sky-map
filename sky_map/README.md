@@ -16,6 +16,6 @@ The objects to be displayed in the app include:
 All planets of the solar system
 The sun
 The moon
-At least three constellations of your choice
+At least three constellations of your choice. USE THE NASA API.
 When moving the phone around, the celestial objects shown on the display should change
-Remember to follow best practices for coding and app development, and be sure to document your code and any decisions made during the development process. Don't forget to consider user experience and design when creating the app, as a visually appealing and intuitive interface will be important for its success.
+Remember to follow best practices for coding and app development, and be sure to document your code and any decisions made during the development process. Don't forget to consider user experience and design when creating the app, as a visually appealing and intuitive interface will be important for its success. 

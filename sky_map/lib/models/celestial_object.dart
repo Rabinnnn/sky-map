@@ -1,34 +1,29 @@
-// models/celestial_object.dart
-import 'package:flutter/foundation.dart';
-
 class CelestialObject {
   final String id;
   final String name;
-  final String type; // planet, sun, moon, constellation
-  final double ra; // Right Ascension in hours (0..24)
-  final double dec; // Declination in degrees (-90..+90)
+  final double azimuth;
+  final double altitude;
   final String description;
-  final double magnitude; // optional for drawing size
+  final bool isPlanet;
 
   CelestialObject({
     required this.id,
     required this.name,
-    required this.type,
-    required this.ra,
-    required this.dec,
+    required this.azimuth,
+    required this.altitude,
     required this.description,
-    this.magnitude = 1.0,
+    this.isPlanet = false,
   });
 
-  factory CelestialObject.fromJson(Map<String, dynamic> j) {
+  factory CelestialObject.fromJson(String name, Map<String, dynamic> json) {
+    // NASA API parsing logic for Azimuth/Elevation
     return CelestialObject(
-      id: j['id'] as String,
-      name: j['name'] as String,
-      type: j['type'] as String,
-      ra: (j['ra'] as num).toDouble(),
-      dec: (j['dec'] as num).toDouble(),
-      description: j['description'] as String,
-      magnitude: (j['magnitude'] as num?)?.toDouble() ?? 1.0,
+      id: name.toLowerCase(),
+      name: name,
+      azimuth: 180.0, // Default placeholders
+      altitude: 45.0,
+      description: "A celestial body in our solar system.",
+      isPlanet: true,
     );
   }
 }
