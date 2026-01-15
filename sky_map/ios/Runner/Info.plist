@@ -41,6 +41,21 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	
+	<!-- Location permissions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Sky Map needs your location to show you the celestial objects visible from your position.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Sky Map needs your location to show you the celestial objects visible from your position.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Sky Map needs your location to show you the celestial objects visible from your position.</string>
+	
+	<!-- Motion/Sensor permissions -->
+	<key>NSMotionUsageDescription</key>
+	<string>Sky Map needs access to motion sensors to detect device orientation and show the correct sky view.</string>
+	
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
