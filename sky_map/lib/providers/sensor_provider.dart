@@ -23,22 +23,35 @@ class SensorProvider with ChangeNotifier {
   /// Initialize sensors and start listening
   Future<void> _initialize() async {
     try {
+      debugPrint('Initializing sensor provider...');
+      
       // Request permissions and initialize sensors
       final hasPermissions = await _sensorService.requestPermissions();
       
       if (!hasPermissions) {
-        _error = 'Location or sensor permissions denied';
+        _error = 'Location permissions are required. Please enable location access in your device settings.';
+        debugPrint(_error);
         notifyListeners();
         return;
       }
+
+      debugPrint('Permissions granted, getting initial location...');
 
       // Get initial location
       final location = await _sensorService.getCurrentLocation();
       if (location != null) {
         _location = location;
+        debugPrint('Initial location set: ${location.latitude}, ${location.longitude}');
+      } else {
+        // Use default location if can't get current location
+        _location = GeoLocation(latitude: 0.0, longitude: 0.0);
+        debugPrint('Using default location');
       }
 
       // Start listening to sensor streams
+      debugPrint('Starting sensor streams...');
+      _sensorService.startListening();
+      
       _sensorService.orientationStream.listen((orientation) {
         _orientation = orientation;
         notifyListeners();
@@ -55,6 +68,7 @@ class SensorProvider with ChangeNotifier {
 
       _isInitialized = true;
       _error = null;
+      debugPrint('Sensor provider initialized successfully');
       notifyListeners();
     } catch (e) {
       _error = 'Failed to initialize sensors: $e';
@@ -66,9 +80,11 @@ class SensorProvider with ChangeNotifier {
   /// Manually refresh location
   Future<void> refreshLocation() async {
     try {
+      debugPrint('Refreshing location...');
       final location = await _sensorService.getCurrentLocation();
       if (location != null) {
         _location = location;
+        debugPrint('Location refreshed: ${location.latitude}, ${location.longitude}');
         notifyListeners();
       }
     } catch (e) {

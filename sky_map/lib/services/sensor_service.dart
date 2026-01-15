@@ -23,18 +23,51 @@ class SensorService {
   double _roll = 0.0;  // Device tilt left/right
   double _azimuth = 0.0; // Compass heading
 
-  /// Request necessary permissions
+  /// Request necessary permissions with detailed error handling
   Future<bool> requestPermissions() async {
     try {
-      // Request location permission
-      final locationPermission = await Permission.location.request();
+      debugPrint('Requesting location permissions...');
       
-      if (!locationPermission.isGranted) {
-        debugPrint('Location permission denied');
+      // Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        debugPrint('Location services are disabled. Please enable location services.');
         return false;
       }
 
-      // Sensor permissions are usually granted by default on mobile
+      // Check current permission status
+      LocationPermission permission = await Geolocator.checkPermission();
+      debugPrint('Current location permission: $permission');
+
+      if (permission == LocationPermission.denied) {
+        debugPrint('Requesting location permission...');
+        permission = await Geolocator.requestPermission();
+        debugPrint('Permission result: $permission');
+      }
+
+      if (permission == LocationPermission.denied) {
+        debugPrint('Location permission denied by user');
+        return false;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        debugPrint('Location permissions are permanently denied');
+        // Open app settings for user to manually enable
+        await Geolocator.openLocationSettings();
+        return false;
+      }
+
+      // Additional permission check using permission_handler as backup
+      final status = await Permission.location.status;
+      if (!status.isGranted) {
+        final result = await Permission.location.request();
+        if (!result.isGranted) {
+          debugPrint('Location permission not granted via permission_handler');
+          return false;
+        }
+      }
+
+      debugPrint('Location permissions granted successfully');
       return true;
     } catch (e) {
       debugPrint('Permission error: $e');
@@ -42,9 +75,11 @@ class SensorService {
     }
   }
 
-  /// Get current location
+  /// Get current location with detailed error handling
   Future<GeoLocation?> getCurrentLocation() async {
     try {
+      debugPrint('Getting current location...');
+      
       final hasPermission = await Geolocator.isLocationServiceEnabled();
       if (!hasPermission) {
         debugPrint('Location services disabled');
@@ -53,13 +88,25 @@ class SensorService {
 
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
       );
+
+      debugPrint('Location obtained: ${position.latitude}, ${position.longitude}');
 
       return GeoLocation(
         latitude: position.latitude,
         longitude: position.longitude,
         altitude: position.altitude,
       );
+    } on TimeoutException catch (e) {
+      debugPrint('Location timeout: $e');
+      return null;
+    } on LocationServiceDisabledException catch (e) {
+      debugPrint('Location service disabled: $e');
+      return null;
+    } on PermissionDeniedException catch (e) {
+      debugPrint('Location permission denied: $e');
+      return null;
     } catch (e) {
       debugPrint('Location error: $e');
       return null;
@@ -68,21 +115,43 @@ class SensorService {
 
   /// Start listening to sensors
   void startListening() {
+    debugPrint('Starting sensor listeners...');
+    
     // Listen to accelerometer for device tilt
-    _accelerometerSubscription = accelerometerEvents.listen((event) {
-      _updateOrientation(event);
-    });
+    _accelerometerSubscription = accelerometerEvents.listen(
+      (event) {
+        _updateOrientation(event);
+      },
+      onError: (error) {
+        debugPrint('Accelerometer error: $error');
+      },
+    );
 
     // Listen to compass for heading
-    _compassSubscription = FlutterCompass.events?.listen((event) {
-      if (event.heading != null) {
-        _azimuth = event.heading!;
-        _publishOrientation();
-      }
-    });
+    final compassStream = FlutterCompass.events;
+    if (compassStream != null) {
+      _compassSubscription = compassStream.listen(
+        (event) {
+          if (event.heading != null) {
+            _azimuth = event.heading!;
+            _publishOrientation();
+          }
+        },
+        onError: (error) {
+          debugPrint('Compass error: $error');
+        },
+      );
+    } else {
+      debugPrint('Compass not available on this device');
+      // Use a default north heading if compass not available
+      _azimuth = 0.0;
+      _publishOrientation();
+    }
 
     // Listen to location changes
     _startLocationTracking();
+    
+    debugPrint('Sensor listeners started');
   }
 
   /// Update device orientation from accelerometer data
@@ -114,26 +183,35 @@ class SensorService {
 
   /// Start tracking location continuously
   void _startLocationTracking() {
-    const locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 10, // Update every 10 meters
-    );
-
-    _locationSubscription = Geolocator.getPositionStream(
-      locationSettings: locationSettings,
-    ).listen((Position position) {
-      final location = GeoLocation(
-        latitude: position.latitude,
-        longitude: position.longitude,
-        altitude: position.altitude,
+    try {
+      const locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10, // Update every 10 meters
       );
-      
-      if (!_locationController.isClosed) {
-        _locationController.add(location);
-      }
-    }, onError: (error) {
-      debugPrint('Location stream error: $error');
-    });
+
+      _locationSubscription = Geolocator.getPositionStream(
+        locationSettings: locationSettings,
+      ).listen(
+        (Position position) {
+          final location = GeoLocation(
+            latitude: position.latitude,
+            longitude: position.longitude,
+            altitude: position.altitude,
+          );
+          
+          debugPrint('Location updated: ${location.latitude}, ${location.longitude}');
+          
+          if (!_locationController.isClosed) {
+            _locationController.add(location);
+          }
+        },
+        onError: (error) {
+          debugPrint('Location stream error: $error');
+        },
+      );
+    } catch (e) {
+      debugPrint('Failed to start location tracking: $e');
+    }
   }
 
   /// Dispose resources
